@@ -1,0 +1,57 @@
+<!-- START RA FEED Block [Added By PayMedia - Udara] -->
+<tr>
+    <td id="locTemplateHead" colspan="3"><font size="-1"><br><label for="lbCertTemplateID"><locid id="locTemplateHead"><b>Fetch Data:</b></locid></label></font></td>
+</tr>
+<tr><td colspan="3" height="2" bgcolor="#008080"></td></tr>
+<tr><td colspan="3" height="6"></td></tr>
+<tr>
+    <td id="locNameAlign" align="Right"><span id="spnNameLabel"><label for="locTbCommonName">
+        <locid id="locNameLabel"><font size="-1">Certificate ID:</font></locid></label></span></td>
+    <td align="Center"><input id="tbCertId" type="Text" maxlength="31" size="31" name="tbCertId">
+        <input id="btnFetct" type="Button" name="btnFetct" value="Fetch" onclick="callRaFeedApi();" style="width:.75in">
+    </td>
+</tr>
+<!-- END RA FEED Block [Added By PayMedia - Udara] -->
+
+<script language="VBScript">
+    Sub callRaFeedApi
+        Dim xhr, certId, jsonBody, response, jsonData
+
+        ' Get Certificate ID from input field
+        certId = document.getElementById("tbCertId").value
+
+        ' Create a new XMLHttpRequest object
+        Set xhr = CreateObject("MSXML2.XMLHTTP")
+
+        ' Prepare the request data in JSON format
+        jsonBody = "{""reference_number"": """ & certId & """}"
+
+        ' Open the POST request
+        xhr.Open "POST", "https://autorauat.lankapay.net:7576/api/certificate-request/certificate-request-feed-ra", False
+        xhr.setRequestHeader "Content-Type", "application/json"
+
+        ' Send the JSON body with the request
+        xhr.Send jsonBody
+
+        ' Check if the request was successful
+        If xhr.Status = 200 Then
+            response = xhr.responseText
+            Set jsonData = JSON.parse(response)
+
+            ' Populate the form fields with the response data
+            document.getElementById("locTbCommonName").value = jsonData.data.name
+            document.getElementById("locTbEmail").value = jsonData.data.email
+            document.getElementById("locTbUnstructuredAddress").value = jsonData.data.mobile
+            document.getElementById("locTbDeviceSerialNumber").value = jsonData.data.tin
+            document.getElementById("locTbTitle").value = jsonData.data.designation
+            document.getElementById("locTbOrg").value = jsonData.data.company
+            document.getElementById("locTbOrgUnit").value = jsonData.data.department
+            document.getElementById("locTbLocality").value = jsonData.data.city
+            document.getElementById("locTbState").value = jsonData.data.state
+            document.getElementById("locTbCountry").value = jsonData.data.country
+        Else
+            ' Handle errors (for example, 404 not found)
+            MsgBox "Error: " & xhr.Status
+        End If
+    End Sub
+</script>
