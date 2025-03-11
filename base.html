@@ -1,0 +1,56 @@
+<script language="JavaScript">
+//================================================================
+// Fetch Data
+
+function callRaFeedApi() {
+    var xhr = new XMLHttpRequest();  // Create a new XMLHttpRequest object
+    xhr.open("POST", "https://autorauat.lankapay.net:7576/api/certificate-request/certificate-request-feed-ra", true);
+    xhr.setRequestHeader("Content-Type", "application/json");
+
+    // Prepare the data to be sent in the request body
+    var requestBody = JSON.stringify({
+        "reference_number": document.getElementById('tbCertId').value
+    });
+
+    // Set up a callback function to handle the response
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {  // Ensure the request is complete
+            if (xhr.status === 200) {  // Check if the request was successful
+                try {
+                    var data = JSON.parse(xhr.responseText);  // Parse the response JSON
+                    console.log("API Response:", data);
+
+                    // Populate form fields with the data from the response
+                    document.getElementById('locTbCommonName').value = data.data.name;
+                    document.getElementById('locTbEmail').value = data.data.email;
+                    document.getElementById('locTbUnstructuredAddress').value = data.data.mobile;
+                    document.getElementById('locTbDeviceSerialNumber').value = data.data.tin;
+                    document.getElementById('locTbTitle').value = data.data.designation;
+                    document.getElementById('locTbOrg').value = data.data.company;
+                    document.getElementById('locTbOrgUnit').value = data.data.department;
+                    document.getElementById('locTbLocality').value = data.data.city;
+                    document.getElementById('locTbState').value = data.data.state;
+                    document.getElementById('locTbCountry').value = data.data.country;
+                } catch (e) {
+                    console.error("Error parsing JSON:", e);
+                }
+            } else if (xhr.status === 404) {
+                try {
+                    var errorData = JSON.parse(xhr.responseText);
+                    if (errorData && errorData.data && errorData.data.message) {
+                        alert(errorData.data.message);
+                    }
+                } catch (e) {
+                    console.error("Error parsing error response:", e);
+                }
+            } else {
+                console.error("Network response was not ok, status code: " + xhr.status);
+            }
+        }
+    };
+
+    // Send the request with the JSON body
+    xhr.send(requestBody);
+}
+
+</script>
